@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amit - Now</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -55,6 +56,11 @@
         .media-table th {
             background-color: #f2f2f2;
         }
+        .chart-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+        }
     </style>
 </head>
 <body>
@@ -62,6 +68,30 @@
     <div id="content">Loading content...</div>
 
     <script>
+    function createChart(canvasId, label, labels, data) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
     fetch('https://raw.githubusercontent.com/Eduprit/Now/main/_data/site_content.json')
         .then(response => {
             if (!response.ok) {
@@ -176,7 +206,44 @@
                     </div>`;
             }
 
+            // Running and Steps Graphs
+            if (data["Running Data:"] && data["Steps Data:"]) {
+                contentHtml += `
+                    <div class="section">
+                        <h2>Activity Graphs</h2>
+                        <div class="chart-container">
+                            <h3>Running - Monthly</h3>
+                            <canvas id="runningMonthlyChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h3>Steps - Monthly</h3>
+                            <canvas id="stepsMonthlyChart"></canvas>
+                        </div>
+                    </div>`;
+            }
+
             document.getElementById('content').innerHTML = contentHtml;
+
+            // Create charts
+            if (data["Running Data:"] && data["Steps Data:"]) {
+                function processData(dataString) {
+                    const items = dataString.split(',').slice(1);
+                    const labels = [];
+                    const dataPoints = [];
+                    items.forEach(item => {
+                        const [date, value] = item.trim().split(' ');
+                        labels.unshift(date);
+                        dataPoints.unshift(parseFloat(value));
+                    });
+                    return [labels, dataPoints];
+                }
+
+                const [runningLabels, runningData] = processData(data["Running Data:"].split('Monthly,')[1]);
+                const [stepsLabels, stepsData] = processData(data["Steps Data:"].split('Monthly,')[1]);
+
+                createChart('runningMonthlyChart', 'Monthly Running (km)', runningLabels, runningData);
+                createChart('stepsMonthlyChart', 'Monthly Steps', stepsLabels, stepsData);
+            }
         })
         .catch(error => {
             console.error('Error:', error);
