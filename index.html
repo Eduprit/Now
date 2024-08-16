@@ -13,8 +13,10 @@
             margin: 0 auto;
             padding: 20px;
         }
-        h1, h2 {
+        h1, h2, h3 {
             color: #2c3e50;
+        }
+        h1, h2 {
             border-bottom: 2px solid #3498db;
             padding-bottom: 10px;
         }
@@ -41,36 +43,26 @@
             font-style: italic;
             color: #7f8c8d;
         }
-        #debug {
-            background-color: #f8f8f8;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-top: 20px;
-            white-space: pre-wrap;
-            font-family: monospace;
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
         }
     </style>
 </head>
 <body>
     <h1>Amit's Now Page</h1>
     <div id="content">Loading content...</div>
-    <div id="debug"></div>
 
     <script>
-    const debugElement = document.getElementById('debug');
-    
     fetch('https://raw.githubusercontent.com/Eduprit/Now/main/_data/site_content.json')
         .then(response => {
-            debugElement.textContent += `Fetch response status: ${response.status}\n`;
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
         .then(data => {
-            debugElement.textContent += 'JSON parsed successfully\n';
-            debugElement.textContent += `Parsed data: ${JSON.stringify(data, null, 2)}\n`;
-
             let contentHtml = '';
             
             // Current Activities
@@ -100,9 +92,26 @@
                 contentHtml += `
                     <div class="section">
                         <h2>Media</h2>
-                        ${data["Books"] ? `<h3>Books</h3><p>${data["Books"]}</p>` : ''}
-                        ${data["Movies"] ? `<h3>Movies</h3><p>${data["Movies"]}</p>` : ''}
-                        ${data["TV Shows"] ? `<h3>TV Shows</h3><p>${data["TV Shows"]}</p>` : ''}
+                        <div class="media-grid">
+                            <div>
+                                <h3>Favorites</h3>
+                                ${data["Books"] ? `<p><strong>Books:</strong> ${data["Books"].split(',')[0].trim()}</p>` : ''}
+                                ${data["Movies"] ? `<p><strong>Movies:</strong> ${data["Movies"].split(',')[0].trim()}</p>` : ''}
+                                ${data["TV Shows"] ? `<p><strong>TV Shows:</strong> ${data["TV Shows"].split(',')[0].trim()}</p>` : ''}
+                            </div>
+                            <div>
+                                <h3>Last</h3>
+                                ${data["Books"] ? `<p><strong>Books:</strong> ${data["Books"].split(',')[1] ? data["Books"].split(',')[1].trim() : 'N/A'}</p>` : ''}
+                                ${data["Movies"] ? `<p><strong>Movies:</strong> ${data["Movies"].split(',')[1] ? data["Movies"].split(',')[1].trim() : 'N/A'}</p>` : ''}
+                                ${data["TV Shows"] ? `<p><strong>TV Shows:</strong> ${data["TV Shows"].split(',')[1] ? data["TV Shows"].split(',')[1].trim() : 'N/A'}</p>` : ''}
+                            </div>
+                            <div>
+                                <h3>Current</h3>
+                                ${data["Books"] ? `<p><strong>Books:</strong> ${data["Books"].split(',')[2] ? data["Books"].split(',')[2].trim() : 'N/A'}</p>` : ''}
+                                ${data["Movies"] ? `<p><strong>Movies:</strong> ${data["Movies"].split(',')[2] ? data["Movies"].split(',')[2].trim() : 'N/A'}</p>` : ''}
+                                ${data["TV Shows"] ? `<p><strong>TV Shows:</strong> ${data["TV Shows"].split(',')[2] ? data["TV Shows"].split(',')[2].trim() : 'N/A'}</p>` : ''}
+                            </div>
+                        </div>
                     </div>`;
             }
 
@@ -112,7 +121,7 @@
                     <div class="section">
                         <h2>Running Records</h2>
                         <table>
-                            <tr><th>Distance</th><th>Time</th><th>Date</th></tr>
+                            <tr><th>Distance</th><th>Record</th><th>Date</th></tr>
                             ${data["Running Records"].split('\n').map(record => {
                                 const [distance, time, date] = record.split(',').map(item => item.trim());
                                 return `<tr><td>${distance}</td><td>${time}</td><td class="date">${date}</td></tr>`;
@@ -140,7 +149,6 @@
         })
         .catch(error => {
             console.error('Error:', error);
-            debugElement.textContent += `Error: ${error.message}\n`;
             document.getElementById('content').innerHTML = '<p>Error loading content. Please try again later.</p>';
         });
     </script>
