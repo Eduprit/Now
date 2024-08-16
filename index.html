@@ -4,57 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amit - Now</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+    </style>
 </head>
 <body>
     <h1>Amit's Now Page</h1>
     <div id="content">Loading content...</div>
-    <div id="debug"></div>
 
     <script>
-    const debugElement = document.getElementById('debug');
-    debugElement.innerHTML += '<p>Script started</p>';
-
-    const possiblePaths = [
-        '_data/site_content.json',
-        'site_content.json',
-        '/Now/_data/site_content.json',
-        '/Now/site_content.json',
-        'https://raw.githubusercontent.com/Eduprit/Now/main/_data/site_content.json'
-    ];
-
-    function tryFetch(paths) {
-        if (paths.length === 0) {
-            debugElement.innerHTML += '<p>All paths failed</p>';
-            return;
-        }
-
-        const path = paths.shift();
-        debugElement.innerHTML += `<p>Trying path: ${path}</p>`;
-
-        fetch(path)
-            .then(response => {
-                debugElement.innerHTML += `<p>Fetch response for ${path}: ${response.status}</p>`;
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.text();  // Changed from response.json() for debugging
-            })
-            .then(text => {
-                debugElement.innerHTML += `<p>Received data for ${path}: ${text.substring(0, 100)}...</p>`;
-                const data = JSON.parse(text);
-                let contentHtml = '';
-                for (let [section, content] of Object.entries(data)) {
-                    contentHtml += `<h2>${section}</h2><p>${content}</p>`;
-                }
-                document.getElementById('content').innerHTML = contentHtml;
-            })
-            .catch(e => {
-                debugElement.innerHTML += `<p>Error with ${path}: ${e.message}</p>`;
-                tryFetch(paths);
-            });
-    }
-
-    tryFetch(possiblePaths);
+    fetch('https://raw.githubusercontent.com/Eduprit/Now/main/_data/site_content.json')
+        .then(response => response.json())
+        .then(data => {
+            let contentHtml = '';
+            for (let [section, content] of Object.entries(data)) {
+                contentHtml += `<div class="section"><h2>${section}</h2><p>${content.replace(/\n/g, '<br>')}</p></div>`;
+            }
+            document.getElementById('content').innerHTML = contentHtml;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('content').innerHTML = '<p>Error loading content. Please try again later.</p>';
+        });
     </script>
 </body>
 </html>
