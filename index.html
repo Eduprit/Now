@@ -70,8 +70,9 @@
         const labels = [];
         const dataPoints = [];
         items.forEach(item => {
-            const [date, valueWithUnit] = item.trim().split(' ');
-            labels.unshift(date);
+            const [dateWithYear, valueWithUnit] = item.trim().split(' ');
+            const [month, year] = dateWithYear.split("'");
+            labels.unshift(`${month} '${year}`);
             dataPoints.unshift(parseFloat(valueWithUnit));
         });
         return [labels, dataPoints];
@@ -100,6 +101,10 @@
                 createChart('stepsChart', 'Monthly Steps', stepsLabels, stepsData);
 
                 debugElement.textContent += 'Charts created\n';
+                debugElement.textContent += `Running Labels: ${runningLabels.join(', ')}\n`;
+                debugElement.textContent += `Running Data: ${runningData.join(', ')}\n`;
+                debugElement.textContent += `Steps Labels: ${stepsLabels.join(', ')}\n`;
+                debugElement.textContent += `Steps Data: ${stepsData.join(', ')}\n`;
             } else {
                 debugElement.textContent += 'Running or Steps data missing\n';
             }
