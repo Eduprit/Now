@@ -11,24 +11,50 @@
     <div id="debug"></div>
 
     <script>
-    document.getElementById('debug').innerHTML += '<p>Script started</p>';
+    const debugElement = document.getElementById('debug');
+    debugElement.innerHTML += '<p>Script started</p>';
 
-    fetch('_data/site_content.json')
-        .then(response => {
-            document.getElementById('debug').innerHTML += `<p>Fetch response: ${response.status}</p>`;
-            return response.json();
-        })
-        .then(data => {
-            document.getElementById('debug').innerHTML += '<p>Data loaded</p>';
-            let contentHtml = '';
-            for (let [section, content] of Object.entries(data)) {
-                contentHtml += `<h2>${section}</h2><p>${content}</p>`;
-            }
-            document.getElementById('content').innerHTML = contentHtml;
-        })
-        .catch(error => {
-            document.getElementById('debug').innerHTML += `<p>Error: ${error.message}</p>`;
-        });
+    const possiblePaths = [
+        '_data/site_content.json',
+        'site_content.json',
+        '/Now/_data/site_content.json',
+        '/Now/site_content.json',
+        'https://raw.githubusercontent.com/Eduprit/Now/main/_data/site_content.json'
+    ];
+
+    function tryFetch(paths) {
+        if (paths.length === 0) {
+            debugElement.innerHTML += '<p>All paths failed</p>';
+            return;
+        }
+
+        const path = paths.shift();
+        debugElement.innerHTML += `<p>Trying path: ${path}</p>`;
+
+        fetch(path)
+            .then(response => {
+                debugElement.innerHTML += `<p>Fetch response for ${path}: ${response.status}</p>`;
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();  // Changed from response.json() for debugging
+            })
+            .then(text => {
+                debugElement.innerHTML += `<p>Received data for ${path}: ${text.substring(0, 100)}...</p>`;
+                const data = JSON.parse(text);
+                let contentHtml = '';
+                for (let [section, content] of Object.entries(data)) {
+                    contentHtml += `<h2>${section}</h2><p>${content}</p>`;
+                }
+                document.getElementById('content').innerHTML = contentHtml;
+            })
+            .catch(e => {
+                debugElement.innerHTML += `<p>Error with ${path}: ${e.message}</p>`;
+                tryFetch(paths);
+            });
+    }
+
+    tryFetch(possiblePaths);
     </script>
 </body>
 </html>
