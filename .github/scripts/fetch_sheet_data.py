@@ -10,8 +10,8 @@ creds = service_account.Credentials.from_service_account_info(creds_dict)
 service = build('sheets', 'v4', credentials=creds)
 
 # The ID and range of your spreadsheet
-SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID'  # Replace this with your actual spreadsheet ID
-RANGE_NAME = 'Sheet1!A1:B'  # Adjust if your sheet name or range is different
+SPREADSHEET_ID = '1EEIcQPmBOzSU-wXebN9i8SweDOrbAAfhr7Kd0cpYf3w'  # Replace this with your actual spreadsheet ID
+RANGE_NAME = 'stats!A1:B'  # Adjust if your sheet name or range is different
 
 # Call the Sheets API
 sheet = service.spreadsheets()
