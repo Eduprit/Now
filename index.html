@@ -1,21 +1,34 @@
-<script>
-    fetch('/Now/_data/site_content.json')  // Replace 'Now' with your repository name if different
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amit - Now</title>
+</head>
+<body>
+    <h1>Amit's Now Page</h1>
+    <div id="content">Loading content...</div>
+    <div id="debug"></div>
+
+    <script>
+    document.getElementById('debug').innerHTML += '<p>Script started</p>';
+
+    fetch('_data/site_content.json')
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            document.getElementById('debug').innerHTML += `<p>Fetch response: ${response.status}</p>`;
             return response.json();
         })
         .then(data => {
+            document.getElementById('debug').innerHTML += '<p>Data loaded</p>';
             let contentHtml = '';
             for (let [section, content] of Object.entries(data)) {
                 contentHtml += `<h2>${section}</h2><p>${content}</p>`;
             }
             document.getElementById('content').innerHTML = contentHtml;
-            document.getElementById('debug').innerHTML = 'Data loaded successfully!';
         })
-        .catch(e => {
-            console.error('There was a problem with the fetch operation:', e);
-            document.getElementById('debug').innerHTML = `Error: ${e.message}`;
+        .catch(error => {
+            document.getElementById('debug').innerHTML += `<p>Error: ${error.message}</p>`;
         });
-</script>
+    </script>
+</body>
+</html>
