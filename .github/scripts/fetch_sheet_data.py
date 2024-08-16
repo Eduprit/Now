@@ -13,7 +13,7 @@ try:
 
     # The ID and range of your spreadsheet
     SPREADSHEET_ID = '1EEIcQPmBOzSU-wXebN9i8SweDOrbAAfhr7Kd0cpYf3w'  # Replace this with your actual spreadsheet ID
-    RANGE_NAME = 'stats!A1:B40'  # Adjust if your sheet name or range is different
+    RANGE_NAME = 'Sheet1!A1:B50'  # Adjust if your sheet name or range is different
 
     # Call the Sheets API
     sheet = service.spreadsheets()
@@ -25,6 +25,9 @@ try:
     for row in values[1:]:  # Skip the header row
         if len(row) > 1:
             data[row[0]] = row[1]
+
+    # Ensure the _data directory exists
+    os.makedirs('_data', exist_ok=True)
 
     # Write to a JSON file
     with open('_data/site_content.json', 'w') as f:
