@@ -5,114 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amit - Now</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h1, h2 {
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
-        }
-        ul {
-            padding-left: 20px;
-        }
-        .section {
-            margin-bottom: 30px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
+        /* ... (keep the existing styles) ... */
+        #debug {
+            background-color: #f8f8f8;
             border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .date {
-            font-style: italic;
-            color: #7f8c8d;
+            padding: 10px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
         }
     </style>
 </head>
 <body>
     <h1>Amit's Now Page</h1>
-    <div id="content">Loading content....</div>
+    <div id="content">Loading content...</div>
+    <div id="debug"></div>
 
     <script>
+    const debugElement = document.getElementById('debug');
+    
     fetch('https://raw.githubusercontent.com/Eduprit/Now/main/_data/site_content.json')
-        .then(response => response.json())
+        .then(response => {
+            debugElement.textContent += `Fetch response status: ${response.status}\n`;
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.text();  // Get the raw text first
+        })
+        .then(text => {
+            debugElement.textContent += `Received data: ${text.substring(0, 100)}...\n`;  // Show the first 100 characters
+            return JSON.parse(text);  // Then parse it as JSON
+        })
         .then(data => {
+            debugElement.textContent += 'JSON parsed successfully\n';
             let contentHtml = '';
             
-            // Current Activities
-            contentHtml += `
-                <div class="section">
-                    <h2>Currently</h2>
-                    <ul>
-                        ${data["These days I am:"].split('-').filter(item => item.trim()).map(item => `<li>${item.trim()}</li>`).join('')}
-                    </ul>
-                </div>`;
-
-            // Interests
-            contentHtml += `
-                <div class="section">
-                    <h2>Interests</h2>
-                    <ul>
-                        ${data["A few topics I'm currently interested in:"].split('-').filter(item => item.trim()).map(item => `<li>${item.trim()}</li>`).join('')}
-                    </ul>
-                </div>`;
-
-            // Media
-            contentHtml += `
-                <div class="section">
-                    <h2>Media</h2>
-                    <h3>Books</h3>
-                    <p>${data["Books"]}</p>
-                    <h3>Movies</h3>
-                    <p>${data["Movies"]}</p>
-                    <h3>TV Shows</h3>
-                    <p>${data["TV Shows"]}</p>
-                </div>`;
-
-            // Running Records
-            contentHtml += `
-                <div class="section">
-                    <h2>Running Records</h2>
-                    <table>
-                        <tr><th>Distance</th><th>Time</th><th>Date</th></tr>
-                        ${data["Running Records"].split('\n').map(record => {
-                            const [distance, time, date] = record.split(',').map(item => item.trim());
-                            return `<tr><td>${distance}</td><td>${time}</td><td class="date">${date}</td></tr>`;
-                        }).join('')}
-                    </table>
-                </div>`;
-
-            // Steps Records
-            contentHtml += `
-                <div class="section">
-                    <h2>Steps Records</h2>
-                    <table>
-                        <tr><th>Category</th><th>Record</th><th>Date/Period</th></tr>
-                        ${data["Steps Records"].split('\n').map(record => {
-                            const [category, value, date] = record.split(',').map(item => item.trim());
-                            return `<tr><td>${category}</td><td>${value}</td><td class="date">${date}</td></tr>`;
-                        }).join('')}
-                    </table>
-                </div>`;
+            // ... (keep the existing content generation code) ...
 
             document.getElementById('content').innerHTML = contentHtml;
         })
         .catch(error => {
             console.error('Error:', error);
+            debugElement.textContent += `Error: ${error.message}\n`;
             document.getElementById('content').innerHTML = '<p>Error loading content. Please try again later.</p>';
         });
     </script>
