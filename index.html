@@ -46,6 +46,9 @@
             font-style: italic;
             color: #7f8c8d;
         }
+        .category {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -156,7 +159,7 @@
                                 <th>Category</th>
                                 <th>Favorites</th>
                                 <th>Last</th>
-                                <th>Current</th>
+                                <th>Current/Next</th>
                             </tr>`;
                 
                 ["Books", "Movies", "TV Shows"].forEach(category => {
@@ -164,7 +167,7 @@
                         const items = data[category].split(',').map(item => item.trim());
                         contentHtml += `
                             <tr>
-                                <td>${category}</td>
+                                <td class="category">${category}</td>
                                 <td>${items[0] || 'N/A'}</td>
                                 <td>${items[1] || 'N/A'}</td>
                                 <td>${items[2] || 'N/A'}</td>
@@ -186,7 +189,7 @@
                             <tr><th>Distance</th><th>Record</th><th>Date</th></tr>
                             ${data["Running Records"].split('\n').map(record => {
                                 const [distance, time, date] = record.split(',').map(item => item.trim());
-                                return `<tr><td>${distance}</td><td>${time}</td><td class="date">${date}</td></tr>`;
+                                return `<tr><td class="category">${distance}</td><td>${time}</td><td class="date">${date}</td></tr>`;
                             }).join('')}
                         </table>
                     </div>`;
@@ -201,7 +204,7 @@
                             <tr><th>Category</th><th>Record</th><th>Date/Period</th></tr>
                             ${data["Steps Records"].split('\n').map(record => {
                                 const [category, value, date] = record.split(',').map(item => item.trim());
-                                return `<tr><td>${category}</td><td>${value}</td><td class="date">${date}</td></tr>`;
+                                return `<tr><td class="category">${category}</td><td>${value}</td><td class="date">${date}</td></tr>`;
                             }).join('')}
                         </table>
                     </div>`;
