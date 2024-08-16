@@ -4,38 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amit - Now</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h1, h2 {
-            color: #2c3e50;
-        }
-        nav {
-            margin-bottom: 20px;
-        }
-        nav a {
-            margin-right: 15px;
-            text-decoration: none;
-            color: #3498db;
-        }
-        ul {
-            padding-left: 20px;
-        }
-        .updated {
-            font-style: italic;
-            color: #7f8c8d;
-            margin-top: 30px;
-        }
-        .section {
-            margin-bottom: 30px;
-        }
-    </style>
+    <!-- Your existing styles here -->
 </head>
 <body>
     <header>
@@ -48,40 +17,20 @@
         </nav>
     </header>
 
-    <main>
-        <div class="section">
-            <h2>Now</h2>
-            <p>These days I am:</p>
-            <ul>
-                <li>Building academic content for the NGO - 'JOSH'</li>
-                <li>Reading Fiction - 'Verity' and 'A Flicker in the Dark'</li>
-                <li>Reading Non-Fiction - 'A Humble Pi'</li>
-                <li>Preparing for Marathon in October</li>
-            </ul>
-        </div>
-
-        <div class="section">
-            <h2>Topics</h2>
-            <p>A few topics I'm currently interested in:</p>
-            <ul>
-                <li>Scalable educational solutions</li>
-                <li>Accessible and engaging content development</li>
-                <li>Product Management</li>
-                <li>Gamification in education</li>
-            </ul>
-        </div>
-
-        <p class="updated">Updated on: <span id="update-date"></span></p>
-        <p>This is my <em>now page</em>, where I tell you what I am up to at this point in my life.</p>
+    <main id="content">
+        <!-- Content will be dynamically inserted here -->
     </main>
 
     <script>
-        function updateDate() {
-            const now = new Date();
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('update-date').textContent = now.toLocaleDateString('en-US', options);
-        }
-        updateDate();
+        fetch('_data/site_content.json')
+            .then(response => response.json())
+            .then(data => {
+                let contentHtml = '';
+                for (let [section, content] of Object.entries(data)) {
+                    contentHtml += `<h2>${section}</h2><p>${content}</p>`;
+                }
+                document.getElementById('content').innerHTML = contentHtml;
+            });
     </script>
 </body>
 </html>
