@@ -4,18 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amit - Now</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        /* ... (keep existing styles) ... */
-        #debug {
-            background-color: #f8f8f8;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-top: 20px;
-            white-space: pre-wrap;
-            font-family: monospace;
-        }
-    </style>
 </head>
 <body>
     <h1>Amit's Now Page</h1>
@@ -23,31 +11,10 @@
     <div id="debug"></div>
 
     <script>
-    function createChart(canvasId, label, labels, data) {
-        const ctx = document.getElementById(canvasId).getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: label,
-                    data: data,
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    }
-
+    const contentElement = document.getElementById('content');
     const debugElement = document.getElementById('debug');
+
+    debugElement.textContent += 'Script started\n';
 
     fetch('https://raw.githubusercontent.com/Eduprit/Now/main/_data/site_content.json')
         .then(response => {
@@ -55,6 +22,22 @@
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            return response.json();
+            return response.text();  // Get the raw text first
+        })
+        .then(text => {
+            debugElement.textContent += `Received data: ${text.substring(0, 100)}...\n`;  // Show the first 100 characters
+            return JSON.parse(text);  // Then parse it as JSON
         })
         .then(data => {
+            debugElement.textContent += 'JSON parsed successfully\n';
+            contentElement.innerHTML = '<p>Data loaded successfully!</p>';
+            debugElement.textContent += `Data keys: ${Object.keys(data).join(', ')}\n`;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            contentElement.innerHTML = '<p>Error loading content. Please check the debug information below.</p>';
+            debugElement.textContent += `Error: ${error.message}\n`;
+        });
+    </script>
+</body>
+</html>
