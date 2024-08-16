@@ -27,6 +27,7 @@
         }
         .chart-container {
             width: 48%;
+            height: 400px; /* Fixed height for charts */
         }
         table {
             width: 100%;
@@ -40,14 +41,6 @@
         }
         th {
             background-color: #f2f2f2;
-        }
-        #debug {
-            background-color: #f8f8f8;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-top: 20px;
-            white-space: pre-wrap;
-            font-family: monospace;
         }
     </style>
 </head>
@@ -64,14 +57,18 @@
             <canvas id="stepsChart"></canvas>
         </div>
     </div>
-    <div id="debug"></div>
 
     <script>
     const contentElement = document.getElementById('content');
-    const debugElement = document.getElementById('debug');
 
     function createChart(canvasId, label, labels, data) {
         const ctx = document.getElementById(canvasId).getContext('2d');
+        const minValue = Math.min(...data);
+        const maxValue = Math.max(...data);
+        const range = maxValue - minValue;
+        const yMin = Math.max(0, minValue - range * 0.1);
+        const yMax = maxValue + range * 0.1;
+
         new Chart(ctx, {
             type: 'line',
             data: {
@@ -88,7 +85,9 @@
                 maintainAspectRatio: false,
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: false,
+                        min: yMin,
+                        max: yMax
                     }
                 }
             }
