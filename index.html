@@ -27,7 +27,7 @@
         }
         .chart-container {
             width: 48%;
-            height: 400px; /* Fixed height for charts */
+            height: 400px;
         }
         table {
             width: 100%;
@@ -42,6 +42,10 @@
         th {
             background-color: #f2f2f2;
         }
+        .date {
+            font-style: italic;
+            color: #7f8c8d;
+        }
     </style>
 </head>
 <body>
@@ -49,11 +53,11 @@
     <div id="content">Loading content...</div>
     <div class="charts-container">
         <div class="chart-container">
-            <h2>Running - Monthly</h2>
+            <h2>Running</h2>
             <canvas id="runningChart"></canvas>
         </div>
         <div class="chart-container">
-            <h2>Steps - Monthly</h2>
+            <h2>Steps</h2>
             <canvas id="stepsChart"></canvas>
         </div>
     </div>
@@ -173,14 +177,44 @@
                     </div>`;
             }
 
+            // Running Records
+            if (data["Running Records"]) {
+                contentHtml += `
+                    <div class="section">
+                        <h2>Running Records</h2>
+                        <table>
+                            <tr><th>Distance</th><th>Record</th><th>Date</th></tr>
+                            ${data["Running Records"].split('\n').map(record => {
+                                const [distance, time, date] = record.split(',').map(item => item.trim());
+                                return `<tr><td>${distance}</td><td>${time}</td><td class="date">${date}</td></tr>`;
+                            }).join('')}
+                        </table>
+                    </div>`;
+            }
+
+            // Steps Records
+            if (data["Steps Records"]) {
+                contentHtml += `
+                    <div class="section">
+                        <h2>Steps Records</h2>
+                        <table>
+                            <tr><th>Category</th><th>Record</th><th>Date/Period</th></tr>
+                            ${data["Steps Records"].split('\n').map(record => {
+                                const [category, value, date] = record.split(',').map(item => item.trim());
+                                return `<tr><td>${category}</td><td>${value}</td><td class="date">${date}</td></tr>`;
+                            }).join('')}
+                        </table>
+                    </div>`;
+            }
+
             contentElement.innerHTML = contentHtml;
 
             if (data["Running Data:"] && data["Steps Data:"]) {
                 const [runningLabels, runningData] = processData(data["Running Data:"].split('Monthly,')[1]);
                 const [stepsLabels, stepsData] = processData(data["Steps Data:"].split('Monthly,')[1]);
 
-                createChart('runningChart', 'Monthly Running (km)', runningLabels, runningData);
-                createChart('stepsChart', 'Monthly Steps', stepsLabels, stepsData);
+                createChart('runningChart', 'Running (km)', runningLabels, runningData);
+                createChart('stepsChart', 'Steps', stepsLabels, stepsData);
             }
         })
         .catch(error => {
