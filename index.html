@@ -70,10 +70,12 @@
         const labels = [];
         const dataPoints = [];
         items.forEach(item => {
-            const [dateWithYear, valueWithUnit] = item.trim().split(' ');
-            const [month, year] = dateWithYear.split("'");
-            labels.unshift(`${month} '${year}`);
-            dataPoints.unshift(parseFloat(valueWithUnit));
+            const match = item.trim().match(/([A-Za-z]+)\s?'?(\d{2})\s+([\d.]+)(km)?/);
+            if (match) {
+                const [, month, year, value] = match;
+                labels.unshift(`${month} '${year}`);
+                dataPoints.unshift(parseFloat(value));
+            }
         });
         return [labels, dataPoints];
     }
@@ -94,6 +96,9 @@
             debugElement.textContent += `Data keys: ${Object.keys(data).join(', ')}\n`;
 
             if (data["Running Data:"] && data["Steps Data:"]) {
+                debugElement.textContent += `Raw Running Data: ${data["Running Data:"]}\n`;
+                debugElement.textContent += `Raw Steps Data: ${data["Steps Data:"]}\n`;
+
                 const [runningLabels, runningData] = processData(data["Running Data:"].split('Monthly,')[1]);
                 const [stepsLabels, stepsData] = processData(data["Steps Data:"].split('Monthly,')[1]);
 
