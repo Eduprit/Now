@@ -43,10 +43,17 @@
             font-style: italic;
             color: #7f8c8d;
         }
-        .media-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+        .media-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .media-table th, .media-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .media-table th {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
@@ -92,26 +99,49 @@
                 contentHtml += `
                     <div class="section">
                         <h2>Media</h2>
-                        <div class="media-grid">
-                            <div>
-                                <h3>Favorites</h3>
-                                ${data["Books"] ? `<p><strong>Books:</strong> ${data["Books"].split(',')[0].trim()}</p>` : ''}
-                                ${data["Movies"] ? `<p><strong>Movies:</strong> ${data["Movies"].split(',')[0].trim()}</p>` : ''}
-                                ${data["TV Shows"] ? `<p><strong>TV Shows:</strong> ${data["TV Shows"].split(',')[0].trim()}</p>` : ''}
-                            </div>
-                            <div>
-                                <h3>Last</h3>
-                                ${data["Books"] ? `<p><strong>Books:</strong> ${data["Books"].split(',')[1] ? data["Books"].split(',')[1].trim() : 'N/A'}</p>` : ''}
-                                ${data["Movies"] ? `<p><strong>Movies:</strong> ${data["Movies"].split(',')[1] ? data["Movies"].split(',')[1].trim() : 'N/A'}</p>` : ''}
-                                ${data["TV Shows"] ? `<p><strong>TV Shows:</strong> ${data["TV Shows"].split(',')[1] ? data["TV Shows"].split(',')[1].trim() : 'N/A'}</p>` : ''}
-                            </div>
-                            <div>
-                                <h3>Current</h3>
-                                ${data["Books"] ? `<p><strong>Books:</strong> ${data["Books"].split(',')[2] ? data["Books"].split(',')[2].trim() : 'N/A'}</p>` : ''}
-                                ${data["Movies"] ? `<p><strong>Movies:</strong> ${data["Movies"].split(',')[2] ? data["Movies"].split(',')[2].trim() : 'N/A'}</p>` : ''}
-                                ${data["TV Shows"] ? `<p><strong>TV Shows:</strong> ${data["TV Shows"].split(',')[2] ? data["TV Shows"].split(',')[2].trim() : 'N/A'}</p>` : ''}
-                            </div>
-                        </div>
+                        <table class="media-table">
+                            <tr>
+                                <th>Category</th>
+                                <th>Favorites</th>
+                                <th>Last</th>
+                                <th>Current</th>
+                            </tr>`;
+                
+                if (data["Books"]) {
+                    const books = data["Books"].split(',').map(item => item.trim());
+                    contentHtml += `
+                        <tr>
+                            <td>Books</td>
+                            <td>${books[0] || 'N/A'}</td>
+                            <td>${books[1] || 'N/A'}</td>
+                            <td>${books[2] || 'N/A'}</td>
+                        </tr>`;
+                }
+                
+                if (data["Movies"]) {
+                    const movies = data["Movies"].split(',').map(item => item.trim());
+                    contentHtml += `
+                        <tr>
+                            <td>Movies</td>
+                            <td>${movies[0] || 'N/A'}</td>
+                            <td>${movies[1] || 'N/A'}</td>
+                            <td>${movies[2] || 'N/A'}</td>
+                        </tr>`;
+                }
+                
+                if (data["TV Shows"]) {
+                    const tvShows = data["TV Shows"].split(',').map(item => item.trim());
+                    contentHtml += `
+                        <tr>
+                            <td>TV Shows</td>
+                            <td>${tvShows[0] || 'N/A'}</td>
+                            <td>${tvShows[1] || 'N/A'}</td>
+                            <td>${tvShows[2] || 'N/A'}</td>
+                        </tr>`;
+                }
+                
+                contentHtml += `
+                        </table>
                     </div>`;
             }
 
