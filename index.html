@@ -4,15 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amit - Now</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .chart-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+    </style>
 </head>
 <body>
     <h1>Amit's Now Page</h1>
     <div id="content">Loading content...</div>
+    <div class="chart-container">
+        <h2>Running - Monthly</h2>
+        <canvas id="runningChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <h2>Steps - Monthly</h2>
+        <canvas id="stepsChart"></canvas>
+    </div>
     <div id="debug"></div>
 
     <script>
     const contentElement = document.getElementById('content');
     const debugElement = document.getElementById('debug');
+
+    function createChart(canvasId, label, labels, data) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    function processData(dataString) {
+        const items = dataString.split(',').slice(1);
+        const labels = [];
+        const dataPoints = [];
+        items.forEach(item => {
+            const [date, valueWithUnit] = item.trim().split(' ');
+            labels.unshift(date);
+            dataPoints.unshift(parseFloat(valueWithUnit));
+        });
+        return [labels, dataPoints];
+    }
 
     debugElement.textContent += 'Script started\n';
 
@@ -22,16 +85,24 @@
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            return response.text();  // Get the raw text first
-        })
-        .then(text => {
-            debugElement.textContent += `Received data: ${text.substring(0, 100)}...\n`;  // Show the first 100 characters
-            return JSON.parse(text);  // Then parse it as JSON
+            return response.json();
         })
         .then(data => {
             debugElement.textContent += 'JSON parsed successfully\n';
             contentElement.innerHTML = '<p>Data loaded successfully!</p>';
             debugElement.textContent += `Data keys: ${Object.keys(data).join(', ')}\n`;
+
+            if (data["Running Data:"] && data["Steps Data:"]) {
+                const [runningLabels, runningData] = processData(data["Running Data:"].split('Monthly,')[1]);
+                const [stepsLabels, stepsData] = processData(data["Steps Data:"].split('Monthly,')[1]);
+
+                createChart('runningChart', 'Monthly Running (km)', runningLabels, runningData);
+                createChart('stepsChart', 'Monthly Steps', stepsLabels, stepsData);
+
+                debugElement.textContent += 'Charts created\n';
+            } else {
+                debugElement.textContent += 'Running or Steps data missing\n';
+            }
         })
         .catch(error => {
             console.error('Error:', error);
